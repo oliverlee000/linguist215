@@ -9,7 +9,7 @@ Fairy tales include:
 * Jacob and Wilhelm Grimm's _Grimms Fairy Tales_ (Taylor and Edwardes translation)
 * Hans Christian Anderssen's _Fairy Tales_
 
-Contains:
+Repository contains:
 * chunk_df_no_comma_split - all strings of words from fairy rtales, split by any punctuation mark except commas
 * data - Folder containing htmls of each fairy tale extracted from Gutenberg
 * chunk_df_comma_split - all strings of words from fairy tales, split by any punctuation mark (including commas)
