@@ -11,6 +11,6 @@ Fairy tales include:
 
 Repository contains:
 * data - Folder containing htmls of each fairy tale extracted from Gutenberg
-* * chunk_df_comma_split.csv - all strings of words from fairy rtales, split by any punctuation mark including commas
+* chunk_df_comma_split.csv - all strings of words from fairy rtales, split by any punctuation mark including commas
 * chunk_df_no_comma_split.csv - all strings of words from fairy tales, split by any punctuation mark __except__ commas
 * main.py - python script generating chunk_df_comma_split.csv and chunk_df_no_comma_split.csv
