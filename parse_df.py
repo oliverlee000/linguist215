@@ -25,6 +25,7 @@ Returns Stanza
 def prosodify(df, filter_rows):
     df = df[df['word_count'] == CHUNK_SIZE] if filter_rows else df
     df_as_string = '\n'.join(df['chunk'].astype(str))
+    # df_as_string = "This is a test string\nThis is a test string"
     df_as_stanza = prosodic.Text(df_as_string)
     return df_as_stanza
 
@@ -40,22 +41,20 @@ Applies the Strong Metricality methodology found in Borgeson et al. (2020),
    5. FRESOLUTION ('unres_across') 
 
 Params:
-df = fairy tale df as Pandas DataFrame
+data = fairy tale df as Pandas DataFrame
 filter_rows = whether to filter df to rows with exactly CHUNK-SIZE words
 
 Returns:
-parsed_stanza - the df as a Stanza object, parsed for all psosible metrics
-scores - number of violations for the best parse of each line
-num_parses - number of parses for each line
+parsed_df - the df as a Stanza object, parsed for all psosible metrics
+df_scores - number of violations for the best parse of each line
+df_parses - number of best parses for each line
 '''
-def strong_metricality(df, constraints, filter_rows=False):
-    df_as_stanza = prosodify(df, filter_rows) # Convert into Stanza
-    parsed_stanza = df_as_stanza.parse(constraints=constraints)
-
-    scores = parsed_stanza.groupby('line_num')['parse_score'].min()
-    num_parses = parsed_stanza.groupby('line_num').count()
-
-    return parsed_stanza, scores, num_parses
+def strong_metricality(data, constraints, filter_rows=False):
+    df_as_stanza = prosodify(data, filter_rows) # Convert into Stanza
+    parsed_df = df_as_stanza.parse(constraints=constraints)
+    df_scores = parsed_df.df.groupby('line_num', as_index=False)['parse_score'].min()
+    df_parses = [len(i.best_parses) for i in parsed_df]
+    return parsed_df.df, df_scores, df_parses
 
 '''
 Iterate through each html files in data, feed
@@ -65,14 +64,14 @@ def main():
     filename = 'chunk_df_comma_split.csv'
     df = pd.read_csv(filename)
     constraints = ('w_peak', 's_unstress', 'w_stress', 'unres_within', 'unres_across')
-    parsed_stanza, scores, num_parses = strong_metricality(df, constraints=constraints)
+    parsed_stanza, df_scores, num_parses = strong_metricality(df, constraints=constraints)
     new_fn = os.path.splitext(os.path.basename(filename))[0] + 'prosodified.csv'
     parsed_stanza.to_csv(new_fn)
-    mean_violations = scores.mean()
-    mean_parses = num_parses.mean()
+    mean_violations = df_scores['parse_score'].mean()
+    mean_parses = sum(num_parses)/len(num_parses)
     print("Finished.")
     print("Mean number of violations per line:" + str(mean_violations))
-    print("Mean number of parses per line:" + str(mean_parses))
+    print("Mean number of best parses per line:" + str(mean_parses))
         
 
 if __name__ == '__main__':
